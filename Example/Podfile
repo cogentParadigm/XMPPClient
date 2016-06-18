@@ -1,0 +1,14 @@
+use_frameworks!
+
+target 'XMPPClient_Example' do
+  pod 'XMPPClient', :path => '../'
+
+  target 'XMPPClient_Tests' do
+    inherit! :search_paths
+
+    pod 'Quick', '~> 0.8'
+  pod 'Nimble', '~> 3.0'
+  pod 'FBSnapshotTestCase'
+  pod 'Nimble-Snapshots'
+  end
+end
