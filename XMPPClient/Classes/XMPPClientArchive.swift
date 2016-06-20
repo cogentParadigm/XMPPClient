@@ -142,7 +142,7 @@ public class XMPPClientArchive: NSObject {
                 try moc.save()
             }
         } catch {
-            LOG.debug("failed to clear core data")
+            print("failed to clear core data")
         }
     }
 }
