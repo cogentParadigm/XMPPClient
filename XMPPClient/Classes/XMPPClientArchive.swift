@@ -129,7 +129,7 @@ public class XMPPClientArchive: NSObject {
         deleteEntities("XMPPMessageArchiving_Contact_CoreDataObject", fromMoc:storage.mainThreadManagedObjectContext)
     }
     
-    private func deleteEntities(entity:String, fromMoc moc:ManagedObjectContext) {
+    private func deleteEntities(entity:String, fromMoc moc:NSManagedObjectContext) {
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = NSEntityDescription.entityForName(entity, inManagedObjectContext: moc)
         fetchRequest.includesPropertyValues = false
