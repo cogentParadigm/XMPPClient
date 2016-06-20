@@ -21,22 +21,20 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/<GITHUB_USERNAME>/XMPPClient'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
+  s.homepage         = 'https://github.com/cogentParadigm/XMPPClient'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Ali Gangji' => 'ali@neonrain.com' }
-  s.source           = { :git => 'https://github.com/<GITHUB_USERNAME>/XMPPClient.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source           = { :git => 'https://github.com/cogentParadigm/XMPPClient.git', :tag => s.version.to_s }
 
+  s.platform = :ios, '8.0'
   s.ios.deployment_target = '8.0'
+  s.requires_arc = true
 
+  s.dependency 'JSQMessagesViewController'
+  s.dependency 'JSQSystemSoundPlayer', '~> 2.0'  
+  s.dependency 'XMPPFramework'
+
+  s.ios.frameworks = 'Foundation', 'CoreData', 'UIKit', 'CFNetwork', 'Security', 'XMPPFramework'
   s.source_files = 'XMPPClient/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'XMPPClient' => ['XMPPClient/Assets/*.png']
-  # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module', 'ENABLE_BITCODE' => 'NO'}
 end

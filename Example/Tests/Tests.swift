@@ -2,7 +2,6 @@
 
 import Quick
 import Nimble
-import XMPPClient
 
 class TableOfContentsSpec: QuickSpec {
     override func spec() {
