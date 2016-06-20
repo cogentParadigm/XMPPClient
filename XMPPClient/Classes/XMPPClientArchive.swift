@@ -122,6 +122,28 @@ public class XMPPClientArchive: NSObject {
             }
         }
     }
+    
+    public func clearArchive() {
+        deleteEntities("XMPPMessageArchiving_Message_CoreDataObject", fromMoc:storage.mainThreadManagedObjectContext)
+        deleteEntities("XMPPMessageArchiving_Contact_CoreDataObject", fromMoc:storage.mainThreadManagedObjectContext)
+    }
+    
+    private func deleteEntities(entity:String, fromMoc moc:ManagedObjectContext) {
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = NSEntityDescription.entityForName(entity, inManagedObjectContext: moc)
+        fetchRequest.includesPropertyValues = false
+        do {
+            if let results = try moc.executeFetchRequest(fetchRequest) as? [NSManagedObject] {
+                for result in results {
+                    moc.deleteObject(result)
+                }
+                
+                try moc.save()
+            }
+        } catch {
+            LOG.debug("failed to clear core data")
+        }
+    }
 }
 
 extension XMPPClientArchive: XMPPStreamDelegate {
