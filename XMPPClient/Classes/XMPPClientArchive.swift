@@ -27,6 +27,7 @@ public class XMPPClientArchive: NSObject {
     public func setup(connection:XMPPClientConnection) {
         self.connection = connection
         connection.activate(archive)
+        connection.getStream().addDelegate(self, delegateQueue: dispatch_get_main_queue())
     }
     
     public func teardown() {
@@ -120,5 +121,13 @@ public class XMPPClientArchive: NSObject {
                 //catch fetch error here
             }
         }
+    }
+}
+
+extension XMPPClientArchive: XMPPStreamDelegate {
+    public func xmppStream(sender: XMPPStream!, didReceiveIQ iq: XMPPIQ!) -> Bool {
+        print("got iq \(iq)")
+        //TODO: complete retrieval of archives from server
+        return false
     }
 }

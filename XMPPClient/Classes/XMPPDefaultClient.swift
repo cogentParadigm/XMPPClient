@@ -12,14 +12,16 @@ import XMPPFramework
 public typealias XMPPMessageCompletionHandler = (stream: XMPPStream, message: XMPPMessage) -> Void
 
 public protocol XMPPClientDelegate : NSObjectProtocol {
-    func oneStream(sender: XMPPStream, didReceiveMessage message: XMPPMessage, from user: XMPPUserCoreDataStorageObject)
-    func oneStream(sender: XMPPStream, userIsComposing user: XMPPUserCoreDataStorageObject)
+    func xmppClient(sender: XMPPStream, didReceiveMessage message: XMPPMessage, from user: XMPPUserCoreDataStorageObject)
+    func xmppClient(sender: XMPPStream, userIsComposing user: XMPPUserCoreDataStorageObject)
 }
 
 public class XMPPDefaultClient: NSObject {
 
     lazy var connection: XMPPClientConnection = {
-       return XMPPClientConnection()
+        let connection = XMPPClientConnection()
+        connection.delegate = self
+        return connection
     }()
     
     public lazy var archive: XMPPClientArchive = {
@@ -98,9 +100,15 @@ extension XMPPDefaultClient: XMPPStreamDelegate {
     public func xmppStream(sender: XMPPStream, didReceiveMessage message: XMPPMessage) {
         let user = roster.storage.userForJID(message.from(), xmppStream: connection.getStream(), managedObjectContext: roster.storage.mainThreadManagedObjectContext)
         if message.isChatMessageWithBody() {
-            delegate?.oneStream(sender, didReceiveMessage: message, from: user)
+            delegate?.xmppClient(sender, didReceiveMessage: message, from: user)
         } else if let _ = message.elementForName("composing") {
-            delegate?.oneStream(sender, userIsComposing: user)
+            delegate?.xmppClient(sender, userIsComposing: user)
         }
+    }
+}
+
+extension XMPPDefaultClient: XMPPClientConnectionDelegate {
+    public func xmppConnectionDidAuthenticate(sender: XMPPStream) {
+        //TODO: initiate retrieval of archives from server
     }
 }
