@@ -11,11 +11,11 @@ import XMPPFramework
 
 public class XMPPClientCapabilities: NSObject {
     
-    lazy var storage: XMPPCapabilitiesCoreDataStorage = {
+    public lazy var storage: XMPPCapabilitiesCoreDataStorage = {
         return XMPPCapabilitiesCoreDataStorage.sharedInstance()
     }()
     
-    lazy var capabilities: XMPPCapabilities = {
+    public lazy var capabilities: XMPPCapabilities = {
         let capabilities = XMPPCapabilities(capabilitiesStorage:self.storage)
         capabilities.autoFetchHashedCapabilities = true;
         capabilities.autoFetchNonHashedCapabilities = false;

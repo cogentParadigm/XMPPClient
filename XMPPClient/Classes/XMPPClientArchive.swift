@@ -12,11 +12,11 @@ import XMPPFramework
 
 public class XMPPClientArchive: NSObject {
     
-    lazy var storage: XMPPMessageArchivingCoreDataStorage = {
+    public lazy var storage: XMPPMessageArchivingCoreDataStorage = {
        return XMPPMessageArchivingCoreDataStorage.sharedInstance()
     }()
     
-    lazy var archive: XMPPMessageArchiving = {
+    public lazy var archive: XMPPMessageArchiving = {
         let archive = XMPPMessageArchiving(messageArchivingStorage: self.storage)
         archive.clientSideMessageArchivingOnly = true
         return archive

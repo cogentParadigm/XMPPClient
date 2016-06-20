@@ -11,11 +11,11 @@ import XMPPFramework
 
 public class XMPPClientRoster: NSObject {
     
-    lazy var storage: XMPPRosterCoreDataStorage = {
+    public lazy var storage: XMPPRosterCoreDataStorage = {
         return XMPPRosterCoreDataStorage()
     }()
     
-    lazy var roster: XMPPRoster = {
+    public lazy var roster: XMPPRoster = {
         let roster = XMPPRoster(rosterStorage:self.storage)
         roster.autoFetchRoster = true
         roster.autoAcceptKnownPresenceSubscriptionRequests = true

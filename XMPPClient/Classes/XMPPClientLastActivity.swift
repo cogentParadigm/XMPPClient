@@ -11,7 +11,7 @@ import XMPPFramework
 
 public class XMPPClientLastActivity: NSObject {
     
-    lazy var activity: XMPPLastActivity = {
+    public lazy var activity: XMPPLastActivity = {
        return XMPPLastActivity()
     }()
     
