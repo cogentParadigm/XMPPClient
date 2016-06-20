@@ -18,7 +18,7 @@ public protocol XMPPClientDelegate : NSObjectProtocol {
 
 public class XMPPDefaultClient: NSObject {
 
-    lazy var connection: XMPPClientConnection = {
+    public lazy var connection: XMPPClientConnection = {
         let connection = XMPPClientConnection()
         connection.delegate = self
         return connection
