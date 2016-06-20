@@ -44,6 +44,7 @@ public class XMPPDefaultClient: NSObject {
     public var delegate:XMPPClientDelegate?
     
     var messageCompletionHandler:XMPPMessageCompletionHandler?
+    var isSetup = false
     
     public func setup() {
         roster.setup(connection)
@@ -54,6 +55,7 @@ public class XMPPDefaultClient: NSObject {
         }
         
         connection.getStream().addDelegate(self, delegateQueue: dispatch_get_main_queue())
+        isSetup = true
     }
     
     public func teardown() {
@@ -64,6 +66,21 @@ public class XMPPDefaultClient: NSObject {
         receipts.teardown()
         capabilities.teardown()
         roster.teardown()
+        isSetup = false
+    }
+    
+    public func connect(username username:String, password:String) {
+        if !isSetup {
+            setup()
+        }
+        connection.connect(username: username, password: password)
+    }
+    
+    public func disconnect() {
+        connection.disconnect()
+        if isSetup {
+            teardown()
+        }
     }
     
     public func sendMessage(message: String, thread:String, to receiver: String, completionHandler completion:XMPPMessageCompletionHandler) {
