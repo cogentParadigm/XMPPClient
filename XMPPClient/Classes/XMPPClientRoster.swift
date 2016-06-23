@@ -19,6 +19,7 @@ public class XMPPClientRoster: NSObject {
         let roster = XMPPRoster(rosterStorage:self.storage)
         roster.autoFetchRoster = true
         roster.autoAcceptKnownPresenceSubscriptionRequests = true
+        roster.autoClearAllUsersAndResources = false
         return roster
     }()
     

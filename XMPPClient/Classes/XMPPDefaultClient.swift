@@ -36,6 +36,10 @@ public class XMPPDefaultClient: NSObject {
         return XMPPClientRoster()
     }()
     
+    public lazy var vcard:XMPPClientvCard = {
+        return XMPPClientvCard()
+    }()
+    
     public lazy var receipts:XMPPClientDeliveryReceipts = {
         return XMPPClientDeliveryReceipts()
     }()
@@ -48,6 +52,7 @@ public class XMPPDefaultClient: NSObject {
     
     public func setup() {
         roster.setup(connection)
+        vcard.setup(connection)
         capabilities.setup(connection)
         receipts.setup(connection)
         if enableArchiving {
@@ -65,6 +70,7 @@ public class XMPPDefaultClient: NSObject {
         }
         receipts.teardown()
         capabilities.teardown()
+        vcard.teardown()
         roster.teardown()
         isSetup = false
     }
