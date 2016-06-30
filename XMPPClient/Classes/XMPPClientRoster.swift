@@ -11,8 +11,8 @@ import XMPPFramework
 
 public class XMPPClientRoster: NSObject {
     
-    public lazy var storage: XMPPRosterCoreDataStorage = {
-        return XMPPRosterCoreDataStorage()
+    public lazy var storage: XMPPClientRosterCoreDataStorage = {
+        return XMPPClientRosterCoreDataStorage()
     }()
     
     public lazy var roster: XMPPRoster = {
