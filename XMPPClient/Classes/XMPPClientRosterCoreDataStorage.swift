@@ -17,6 +17,9 @@ public class XMPPClientRosterCoreDataStorage: XMPPRosterCoreDataStorage {
     override public func managedObjectModelName() -> String! {
         return "XMPPRoster"
     }
+    override public func managedObjectModelBundle() -> NSBundle! {
+        return NSBundle(forClass: XMPPRosterCoreDataStorage.self)
+    }
     override public func clearAllUsersAndResourcesForXMPPStream(stream: XMPPStream!) {
         //prevent destruction of roster, just clear the resources
         clearAllResourcesForXMPPStream(stream)
