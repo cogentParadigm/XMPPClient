@@ -21,7 +21,9 @@ public class XMPPClientRosterCoreDataStorage: XMPPRosterCoreDataStorage {
         return NSBundle(forClass: XMPPRosterCoreDataStorage.self)
     }
     override public func clearAllUsersAndResourcesForXMPPStream(stream: XMPPStream!) {
-        //prevent destruction of roster, just clear the resources
-        clearAllResourcesForXMPPStream(stream)
+        //prevent destruction of roster
+    }
+    override public func beginRosterPopulationForXMPPStream(stream: XMPPStream!, withVersion version: String!) {
+        //prevent destruction of roster
     }
 }
