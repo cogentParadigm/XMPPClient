@@ -11,13 +11,13 @@ import CoreData
 import JSQMessagesViewController
 import XMPPFramework
 
-public class XMPPClientArchive: NSObject {
+open class XMPPClientArchive: NSObject {
     
-    public lazy var storage: XMPPMessageArchivingCoreDataStorage = {
+    open lazy var storage: XMPPMessageArchivingCoreDataStorage = {
        return XMPPMessageArchivingCoreDataStorage.sharedInstance()
     }()
     
-    public lazy var archive: XMPPMessageArchiving = {
+    open lazy var archive: XMPPMessageArchiving = {
         let archive = XMPPMessageArchiving(messageArchivingStorage: self.storage)
         archive.clientSideMessageArchivingOnly = true
         return archive
@@ -25,17 +25,17 @@ public class XMPPClientArchive: NSObject {
     
     var connection:XMPPClientConnection!
     
-    public func setup(connection:XMPPClientConnection) {
+    open func setup(_ connection:XMPPClientConnection) {
         self.connection = connection
         connection.activate(archive)
-        connection.getStream().addDelegate(self, delegateQueue: dispatch_get_main_queue())
+        connection.getStream().addDelegate(self, delegateQueue: DispatchQueue.main)
     }
     
-    public func teardown() {
+    open func teardown() {
         archive.deactivate()
     }
     
-    public func messagesForJID(jid: String, inThread thread: String) -> NSMutableArray {
+    open func messagesForJID(_ jid: String, inThread thread: String) -> NSMutableArray {
         let moc = storage.mainThreadManagedObjectContext
         let entityDescription = NSEntityDescription.entityForName("XMPPMessageArchiving_Message_CoreDataObject", inManagedObjectContext: moc)
         let request = NSFetchRequest()
@@ -92,8 +92,8 @@ public class XMPPClientArchive: NSObject {
         return sortedRetrievedMessages.mutableCopy() as! NSMutableArray
     }
     
-    public func deleteMessages(messages: NSArray) {
-        messages.enumerateObjectsUsingBlock { (message, idx, stop) -> Void in
+    open func deleteMessages(_ messages: NSArray) {
+        messages.enumerateObjects { (message, idx, stop) -> Void in
             let moc = self.storage.mainThreadManagedObjectContext
             let entityDescription = NSEntityDescription.entityForName("XMPPMessageArchiving_Message_CoreDataObject", inManagedObjectContext: moc)
             let request = NSFetchRequest()
@@ -124,19 +124,19 @@ public class XMPPClientArchive: NSObject {
         }
     }
     
-    public func clearArchive() {
+    open func clearArchive() {
         deleteEntities("XMPPMessageArchiving_Message_CoreDataObject", fromMoc:storage.mainThreadManagedObjectContext)
         deleteEntities("XMPPMessageArchiving_Contact_CoreDataObject", fromMoc:storage.mainThreadManagedObjectContext)
     }
     
-    private func deleteEntities(entity:String, fromMoc moc:NSManagedObjectContext) {
+    fileprivate func deleteEntities(_ entity:String, fromMoc moc:NSManagedObjectContext) {
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = NSEntityDescription.entityForName(entity, inManagedObjectContext: moc)
+        fetchRequest.entity = NSEntityDescription.entity(forEntityName: entity, in: moc)
         fetchRequest.includesPropertyValues = false
         do {
-            if let results = try moc.executeFetchRequest(fetchRequest) as? [NSManagedObject] {
+            if let results = try moc.fetch(fetchRequest) as? [NSManagedObject] {
                 for result in results {
-                    moc.deleteObject(result)
+                    moc.delete(result)
                 }
                 
                 try moc.save()
@@ -148,7 +148,7 @@ public class XMPPClientArchive: NSObject {
 }
 
 extension XMPPClientArchive: XMPPStreamDelegate {
-    public func xmppStream(sender: XMPPStream!, didReceiveIQ iq: XMPPIQ!) -> Bool {
+    public func xmppStream(_ sender: XMPPStream!, didReceiveIQ iq: XMPPIQ!) -> Bool {
         print("got iq \(iq)")
         //TODO: complete retrieval of archives from server
         return false

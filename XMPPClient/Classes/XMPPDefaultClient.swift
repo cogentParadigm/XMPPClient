@@ -12,45 +12,45 @@ import XMPPFramework
 public typealias XMPPMessageCompletionHandler = (stream: XMPPStream, message: XMPPMessage) -> Void
 
 public protocol XMPPClientDelegate : NSObjectProtocol {
-    func xmppClient(sender: XMPPStream, didReceiveMessage message: XMPPMessage, from user: XMPPUserCoreDataStorageObject)
-    func xmppClient(sender: XMPPStream, userIsComposing user: XMPPUserCoreDataStorageObject)
+    func xmppClient(_ sender: XMPPStream, didReceiveMessage message: XMPPMessage, from user: XMPPUserCoreDataStorageObject)
+    func xmppClient(_ sender: XMPPStream, userIsComposing user: XMPPUserCoreDataStorageObject)
 }
 
-public class XMPPDefaultClient: NSObject {
+open class XMPPDefaultClient: NSObject {
 
-    public lazy var connection: XMPPClientConnection = {
+    open lazy var connection: XMPPClientConnection = {
         let connection = XMPPClientConnection()
         connection.delegate = self
         return connection
     }()
     
-    public lazy var archive: XMPPClientArchive = {
+    open lazy var archive: XMPPClientArchive = {
         return XMPPClientArchive()
     }()
     
-    public lazy var capabilities: XMPPClientCapabilities = {
+    open lazy var capabilities: XMPPClientCapabilities = {
         return XMPPClientCapabilities()
     }()
     
-    public lazy var roster:XMPPClientRoster = {
+    open lazy var roster:XMPPClientRoster = {
         return XMPPClientRoster()
     }()
     
-    public lazy var vcard:XMPPClientvCard = {
+    open lazy var vcard:XMPPClientvCard = {
         return XMPPClientvCard()
     }()
     
-    public lazy var receipts:XMPPClientDeliveryReceipts = {
+    open lazy var receipts:XMPPClientDeliveryReceipts = {
         return XMPPClientDeliveryReceipts()
     }()
     
-    public var enableArchiving = true
-    public var delegate:XMPPClientDelegate?
+    open var enableArchiving = true
+    open var delegate:XMPPClientDelegate?
     
     var messageCompletionHandler:XMPPMessageCompletionHandler?
     var isSetup = false
     
-    public func setup() {
+    open func setup() {
         roster.setup(connection)
         vcard.setup(connection)
         capabilities.setup(connection)
@@ -59,11 +59,11 @@ public class XMPPDefaultClient: NSObject {
             archive.setup(connection)
         }
         
-        connection.getStream().addDelegate(self, delegateQueue: dispatch_get_main_queue())
+        connection.getStream().addDelegate(self, delegateQueue: DispatchQueue.main)
         isSetup = true
     }
     
-    public func teardown() {
+    open func teardown() {
         connection.getStream().removeDelegate(self)
         if enableArchiving {
             archive.teardown()
@@ -75,21 +75,21 @@ public class XMPPDefaultClient: NSObject {
         isSetup = false
     }
     
-    public func connect(username username:String, password:String) {
+    open func connect(username:String, password:String) {
         if !isSetup {
             setup()
         }
         connection.connect(username: username, password: password)
     }
     
-    public func disconnect() {
+    open func disconnect() {
         connection.disconnect()
         if isSetup {
             teardown()
         }
     }
     
-    public func sendMessage(message: String, thread:String, to receiver: String, completionHandler completion:XMPPMessageCompletionHandler) {
+    open func sendMessage(_ message: String, thread:String, to receiver: String, completionHandler completion:XMPPMessageCompletionHandler) {
         let body = DDXMLElement.elementWithName("body") as! DDXMLElement
         let messageID = connection.getStream().generateUUID()
         
@@ -114,13 +114,13 @@ public class XMPPDefaultClient: NSObject {
 
 extension XMPPDefaultClient: XMPPStreamDelegate {
     
-    public func xmppStream(sender: XMPPStream, didSendMessage message: XMPPMessage) {
+    public func xmppStream(_ sender: XMPPStream, didSendMessage message: XMPPMessage) {
         if let completion = messageCompletionHandler {
             completion(stream: sender, message: message)
         }
     }
     
-    public func xmppStream(sender: XMPPStream, didReceiveMessage message: XMPPMessage) {
+    public func xmppStream(_ sender: XMPPStream, didReceiveMessage message: XMPPMessage) {
         let user = roster.storage.userForJID(message.from(), xmppStream: connection.getStream(), managedObjectContext: roster.storage.mainThreadManagedObjectContext)
         if message.isChatMessageWithBody() {
             delegate?.xmppClient(sender, didReceiveMessage: message, from: user)
@@ -131,7 +131,7 @@ extension XMPPDefaultClient: XMPPStreamDelegate {
 }
 
 extension XMPPDefaultClient: XMPPClientConnectionDelegate {
-    public func xmppConnectionDidAuthenticate(sender: XMPPStream) {
+    public func xmppConnectionDidAuthenticate(_ sender: XMPPStream) {
         //TODO: initiate retrieval of archives from server
     }
 }

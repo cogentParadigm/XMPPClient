@@ -9,13 +9,13 @@
 import Foundation
 import XMPPFramework
 
-public class XMPPClientRoster: NSObject {
+open class XMPPClientRoster: NSObject {
     
-    public lazy var storage: XMPPClientRosterCoreDataStorage = {
+    open lazy var storage: XMPPClientRosterCoreDataStorage = {
         return XMPPClientRosterCoreDataStorage()
     }()
     
-    public lazy var roster: XMPPRoster = {
+    open lazy var roster: XMPPRoster = {
         let roster = XMPPRoster(rosterStorage:self.storage)
         roster.autoFetchRoster = true
         roster.autoAcceptKnownPresenceSubscriptionRequests = true
@@ -25,16 +25,16 @@ public class XMPPClientRoster: NSObject {
     
     var connection:XMPPClientConnection!
 
-    public func setup(connection:XMPPClientConnection) {
+    open func setup(_ connection:XMPPClientConnection) {
         self.connection = connection
         connection.activate(roster)
     }
     
-    public func teardown() {
+    open func teardown() {
         roster.deactivate()
     }
     
-    public func userForJID(jid: String) -> XMPPUserCoreDataStorageObject? {
+    open func userForJID(_ jid: String) -> XMPPUserCoreDataStorageObject? {
         let userJID = XMPPJID.jidWithString(jid)
         if let user = storage.userForJID(userJID, xmppStream: connection.getStream(), managedObjectContext: storage.mainThreadManagedObjectContext) {
             return user
@@ -43,7 +43,7 @@ public class XMPPClientRoster: NSObject {
         }
     }
     
-    public func sendBuddyRequestTo(username: String) {
+    open func sendBuddyRequestTo(_ username: String) {
         let presence: DDXMLElement = DDXMLElement.elementWithName("presence") as! DDXMLElement
         presence.addAttributeWithName("type", stringValue: "subscribe")
         presence.addAttributeWithName("to", stringValue: username)
@@ -51,7 +51,7 @@ public class XMPPClientRoster: NSObject {
         connection.getStream().sendElement(presence)
     }
     
-    public func acceptBuddyRequestFrom(username: String) {
+    open func acceptBuddyRequestFrom(_ username: String) {
         let presence: DDXMLElement = DDXMLElement.elementWithName("presence") as! DDXMLElement
         presence.addAttributeWithName("to", stringValue: username)
         presence.addAttributeWithName("from", stringValue: connection.getStream().myJID.bare())
@@ -59,7 +59,7 @@ public class XMPPClientRoster: NSObject {
         connection.getStream().sendElement(presence)
     }
     
-    public func declineBuddyRequestFrom(username: String) {
+    open func declineBuddyRequestFrom(_ username: String) {
         let presence: DDXMLElement = DDXMLElement.elementWithName("presence") as! DDXMLElement
         presence.addAttributeWithName("to", stringValue: username)
         presence.addAttributeWithName("from", stringValue: connection.getStream().myJID.bare())

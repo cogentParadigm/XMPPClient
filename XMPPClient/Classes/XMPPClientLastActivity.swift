@@ -9,17 +9,17 @@
 import Foundation
 import XMPPFramework
 
-public class XMPPClientLastActivity: NSObject {
+open class XMPPClientLastActivity: NSObject {
     
-    public lazy var activity: XMPPLastActivity = {
+    open lazy var activity: XMPPLastActivity = {
        return XMPPLastActivity()
     }()
     
-    public func setup(connection:XMPPClientConnection) {
+    open func setup(_ connection:XMPPClientConnection) {
         connection.activate(activity)
     }
     
-    public func teardown() {
+    open func teardown() {
         activity.deactivate()
     }
 }

@@ -9,24 +9,24 @@
 import Foundation
 import XMPPFramework
 
-public class XMPPClientCapabilities: NSObject {
+open class XMPPClientCapabilities: NSObject {
     
-    public lazy var storage: XMPPCapabilitiesCoreDataStorage = {
+    open lazy var storage: XMPPCapabilitiesCoreDataStorage = {
         return XMPPCapabilitiesCoreDataStorage.sharedInstance()
     }()
     
-    public lazy var capabilities: XMPPCapabilities = {
+    open lazy var capabilities: XMPPCapabilities = {
         let capabilities = XMPPCapabilities(capabilitiesStorage:self.storage)
         capabilities.autoFetchHashedCapabilities = true;
         capabilities.autoFetchNonHashedCapabilities = false;
         return capabilities
     }()
     
-    public func setup(connection:XMPPClientConnection) {
+    open func setup(_ connection:XMPPClientConnection) {
         connection.activate(capabilities)
     }
     
-    public func teardown() {
+    open func teardown() {
         capabilities.deactivate()
     }
 }

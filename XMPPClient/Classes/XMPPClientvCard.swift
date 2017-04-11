@@ -9,29 +9,29 @@
 import Foundation
 import XMPPFramework
 
-public class XMPPClientvCard: NSObject {
+open class XMPPClientvCard: NSObject {
 
-    public lazy var storage: XMPPvCardCoreDataStorage = {
+    open lazy var storage: XMPPvCardCoreDataStorage = {
         return XMPPvCardCoreDataStorage.sharedInstance()
     }()
     
-    public lazy var temp: XMPPvCardTempModule = {
+    open lazy var temp: XMPPvCardTempModule = {
         return XMPPvCardTempModule(vCardStorage:self.storage)
     }()
 
-    public lazy var avatar: XMPPvCardAvatarModule = {
+    open lazy var avatar: XMPPvCardAvatarModule = {
         return XMPPvCardAvatarModule(vCardTempModule: self.temp)
     }()
     
     var connection:XMPPClientConnection!
     
-    public func setup(connection:XMPPClientConnection) {
+    open func setup(_ connection:XMPPClientConnection) {
         self.connection = connection
         connection.activate(temp)
         connection.activate(avatar)
     }
     
-    public func teardown() {
+    open func teardown() {
         avatar.deactivate()
         temp.deactivate()
     }

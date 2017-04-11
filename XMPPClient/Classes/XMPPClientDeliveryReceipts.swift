@@ -9,19 +9,19 @@
 import Foundation
 import XMPPFramework
 
-public class XMPPClientDeliveryReceipts: NSObject {
-    public lazy var receipts: XMPPMessageDeliveryReceipts = {
+open class XMPPClientDeliveryReceipts: NSObject {
+    open lazy var receipts: XMPPMessageDeliveryReceipts = {
         let receipts = XMPPMessageDeliveryReceipts(dispatchQueue: dispatch_get_main_queue())
         receipts.autoSendMessageDeliveryReceipts = true
         receipts.autoSendMessageDeliveryRequests = true
         return receipts
     }()
     
-    public func setup(connection:XMPPClientConnection) {
+    open func setup(_ connection:XMPPClientConnection) {
         connection.activate(receipts)
     }
     
-    public func teardown() {
+    open func teardown() {
         receipts.deactivate()
     }
 }

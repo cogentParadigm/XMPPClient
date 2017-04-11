@@ -9,21 +9,21 @@
 import Foundation
 import XMPPFramework
 
-public class XMPPClientRosterCoreDataStorage: XMPPRosterCoreDataStorage {
-    override public func commonInit() {
+open class XMPPClientRosterCoreDataStorage: XMPPRosterCoreDataStorage {
+    override open func commonInit() {
         super.commonInit()
         autoRemovePreviousDatabaseFile = false
     }
-    override public func managedObjectModelName() -> String! {
+    override open func managedObjectModelName() -> String! {
         return "XMPPRoster"
     }
-    override public func managedObjectModelBundle() -> NSBundle! {
-        return NSBundle(forClass: XMPPRosterCoreDataStorage.self)
+    override open func managedObjectModelBundle() -> Bundle! {
+        return Bundle(forClass: XMPPRosterCoreDataStorage.self)
     }
-    override public func clearAllUsersAndResourcesForXMPPStream(stream: XMPPStream!) {
+    override open func clearAllUsersAndResourcesForXMPPStream(_ stream: XMPPStream!) {
         //prevent destruction of roster
     }
-    override public func beginRosterPopulationForXMPPStream(stream: XMPPStream!, withVersion version: String!) {
+    override open func beginRosterPopulationForXMPPStream(_ stream: XMPPStream!, withVersion version: String!) {
         //prevent destruction of roster
     }
 }
