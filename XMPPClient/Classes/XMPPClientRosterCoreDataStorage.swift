@@ -18,12 +18,13 @@ open class XMPPClientRosterCoreDataStorage: XMPPRosterCoreDataStorage {
         return "XMPPRoster"
     }
     override open func managedObjectModelBundle() -> Bundle! {
-        return Bundle(forClass: XMPPRosterCoreDataStorage.self)
+        return Bundle(for: XMPPRosterCoreDataStorage.self)
     }
-    override open func clearAllUsersAndResourcesForXMPPStream(_ stream: XMPPStream!) {
+    override open func clearAllUsersAndResources(for stream: XMPPStream!) {
+        //these used to override parent methods
         //prevent destruction of roster
     }
-    override open func beginRosterPopulationForXMPPStream(_ stream: XMPPStream!, withVersion version: String!) {
+    override open func beginRosterPopulation(for stream: XMPPStream!, withVersion version: String!) {
         //prevent destruction of roster
     }
 }

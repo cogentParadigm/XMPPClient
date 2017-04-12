@@ -18,7 +18,7 @@ open class XMPPClientArchive: NSObject {
     }()
     
     open lazy var archive: XMPPMessageArchiving = {
-        let archive = XMPPMessageArchiving(messageArchivingStorage: self.storage)
+        let archive = XMPPMessageArchiving(messageArchivingStorage: self.storage)!
         archive.clientSideMessageArchivingOnly = true
         return archive
     }()
@@ -35,42 +35,42 @@ open class XMPPClientArchive: NSObject {
         archive.deactivate()
     }
     
-    open func messagesForJID(_ jid: String, inThread thread: String) -> NSMutableArray {
-        let moc = storage.mainThreadManagedObjectContext
-        let entityDescription = NSEntityDescription.entityForName("XMPPMessageArchiving_Message_CoreDataObject", inManagedObjectContext: moc)
-        let request = NSFetchRequest()
+    open func messagesForJID(_ jid: String, inThread thread: String) -> [Any] {
+        let moc = storage.mainThreadManagedObjectContext!
+        let entityDescription = NSEntityDescription.entity(forEntityName: "XMPPMessageArchiving_Message_CoreDataObject", in: moc)
+        let request = NSFetchRequest<XMPPMessageArchiving_Message_CoreDataObject>()
         let predicateFormat = "bareJidStr like %@ ANd thread like %@"
         let predicate = NSPredicate(format: predicateFormat, jid, thread)
         let retrievedMessages = NSMutableArray()
-        var sortedRetrievedMessages = NSArray()
+        var sortedRetrievedMessages = [Any]()
         
         request.predicate = predicate
         request.entity = entityDescription
         
         do {
-            let results = try moc?.executeFetchRequest(request)
+            let results = try moc.fetch(request)
             
-            for message in results! {
+            for message in results {
                 var element: DDXMLElement!
                 do {
-                    element = try DDXMLElement(XMLString: message.messageStr)
+                    element = try DDXMLElement(xmlString: message.messageStr)
                 } catch _ {
                     element = nil
                 }
                 
                 let body: String
                 let sender: String
-                let date: NSDate
+                let date: Date
                 
                 date = message.timestamp
                 
-                if message.body() != nil {
-                    body = message.body()
+                if message.body != nil {
+                    body = message.body
                 } else {
                     body = ""
                 }
                 
-                if element.attributeStringValueForName("to") == jid {
+                if element.attributeStringValue(forName: "to") == jid {
                     let displayName = connection.getStream().myJID
                     sender = displayName!.bare()
                 } else {
@@ -78,25 +78,25 @@ open class XMPPClientArchive: NSObject {
                 }
                 
                 let fullMessage = JSQMessage(senderId: sender, senderDisplayName: sender, date: date, text: body)
-                retrievedMessages.addObject(fullMessage)
+                retrievedMessages.add(fullMessage)
                 
                 
                 let descriptor:NSSortDescriptor = NSSortDescriptor(key: "date", ascending: true);
                 
-                sortedRetrievedMessages = retrievedMessages.sortedArrayUsingDescriptors([descriptor]);
+                sortedRetrievedMessages = (retrievedMessages as NSArray).sortedArray(using: [descriptor]);
                 
             }
         } catch _ {
             //catch fetch error here
         }
-        return sortedRetrievedMessages.mutableCopy() as! NSMutableArray
+        return sortedRetrievedMessages
     }
     
     open func deleteMessages(_ messages: NSArray) {
-        messages.enumerateObjects { (message, idx, stop) -> Void in
+        messages.enumerateObjects(using: { (message, idx, stop) -> Void in
             let moc = self.storage.mainThreadManagedObjectContext
-            let entityDescription = NSEntityDescription.entityForName("XMPPMessageArchiving_Message_CoreDataObject", inManagedObjectContext: moc)
-            let request = NSFetchRequest()
+            let entityDescription = NSEntityDescription.entity(forEntityName: "XMPPMessageArchiving_Message_CoreDataObject", in: moc!)
+            let request = NSFetchRequest<XMPPMessageArchiving_Message_CoreDataObject>()
             let predicateFormat = "messageStr like %@ "
             let predicate = NSPredicate(format: predicateFormat, message as! String)
             
@@ -104,24 +104,24 @@ open class XMPPClientArchive: NSObject {
             request.entity = entityDescription
             
             do {
-                let results = try moc?.executeFetchRequest(request)
+                let results = try moc?.fetch(request)
                 
                 for message in results! {
                     var element: DDXMLElement!
                     do {
-                        element = try DDXMLElement(XMLString: message.messageStr)
+                        element = try DDXMLElement(xmlString: message.messageStr)
                     } catch _ {
                         element = nil
                     }
                     
-                    if element.attributeStringValueForName("messageStr") == message as! String {
-                        moc.deleteObject(message as! NSManagedObject)
+                    if element.attributeStringValue(forName: "messageStr") == message as! String {
+                        moc?.delete(message as! NSManagedObject)
                     }
                 }
             } catch _ {
                 //catch fetch error here
             }
-        }
+        })
     }
     
     open func clearArchive() {
@@ -130,7 +130,7 @@ open class XMPPClientArchive: NSObject {
     }
     
     fileprivate func deleteEntities(_ entity:String, fromMoc moc:NSManagedObjectContext) {
-        let fetchRequest = NSFetchRequest()
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = NSEntityDescription.entity(forEntityName: entity, in: moc)
         fetchRequest.includesPropertyValues = false
         do {
@@ -148,7 +148,7 @@ open class XMPPClientArchive: NSObject {
 }
 
 extension XMPPClientArchive: XMPPStreamDelegate {
-    public func xmppStream(_ sender: XMPPStream!, didReceiveIQ iq: XMPPIQ!) -> Bool {
+    public func xmppStream(_ sender: XMPPStream!, didReceive iq: XMPPIQ!) -> Bool {
         print("got iq \(iq)")
         //TODO: complete retrieval of archives from server
         return false

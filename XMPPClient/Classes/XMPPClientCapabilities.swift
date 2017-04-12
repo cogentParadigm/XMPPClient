@@ -16,7 +16,7 @@ open class XMPPClientCapabilities: NSObject {
     }()
     
     open lazy var capabilities: XMPPCapabilities = {
-        let capabilities = XMPPCapabilities(capabilitiesStorage:self.storage)
+        let capabilities = XMPPCapabilities(capabilitiesStorage:self.storage)!
         capabilities.autoFetchHashedCapabilities = true;
         capabilities.autoFetchNonHashedCapabilities = false;
         return capabilities

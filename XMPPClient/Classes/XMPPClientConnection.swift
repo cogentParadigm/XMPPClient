@@ -21,21 +21,21 @@ import Foundation
 import XMPPFramework
 
 @objc public protocol XMPPClientConnectionDelegate {
-    optional func xmppConnection(_ sender: XMPPStream!, socketDidConnect socket: GCDAsyncSocket!)
-    optional func xmppConnectionDidConnect(_ sender: XMPPStream)
-    optional func xmppConnectionDidAuthenticate(_ sender: XMPPStream)
-    optional func xmppConnection(_ sender: XMPPStream, didNotAuthenticate error: DDXMLElement)
-    optional func xmppConnectionDidDisconnect(_ sender: XMPPStream, withError error: NSError)
+    @objc optional func xmppConnection(_ sender: XMPPStream!, socketDidConnect socket: GCDAsyncSocket!)
+    @objc optional func xmppConnectionDidConnect(_ sender: XMPPStream)
+    @objc optional func xmppConnectionDidAuthenticate(_ sender: XMPPStream)
+    @objc optional func xmppConnection(_ sender: XMPPStream, didNotAuthenticate error: DDXMLElement)
+    @objc optional func xmppConnectionDidDisconnect(_ sender: XMPPStream, withError error: NSError)
 }
 
 open class XMPPClientConnection: NSObject {
     
     lazy var stream:XMPPStream = {
-        let stream = XMPPStream()
+        let stream = XMPPStream()!
         #if !TARGET_IPHONE_SIMULATOR
             stream.enableBackgroundingOnSocket = true
         #endif
-        stream.addDelegate(self, delegateQueue: dispatch_get_main_queue())
+        stream.addDelegate(self, delegateQueue: DispatchQueue.main)
         self.reconnect.activate(stream)
         return stream
     }()
@@ -53,9 +53,9 @@ open class XMPPClientConnection: NSObject {
         if (isConnected()) {
             delegate?.xmppConnectionDidConnect?(stream)
         } else {
-            stream.myJID = XMPPJID.jidWithString(username)
+            stream.myJID = XMPPJID(string:username)
             self.password = password
-            try! stream.connectWithTimeout(XMPPStreamTimeoutNone)
+            try! stream.connect(withTimeout: XMPPStreamTimeoutNone)
         }
     }
     
@@ -77,7 +77,7 @@ open class XMPPClientConnection: NSObject {
     }
     
     open func send(_ element:DDXMLElement!) {
-        stream.sendElement(element)
+        stream.send(element)
     }
     
     open func goOnline() {
@@ -86,7 +86,7 @@ open class XMPPClientConnection: NSObject {
         
         if domain == "gmail.com" || domain == "gtalk.com" || domain == "talk.google.com" {
             let priority: DDXMLElement = DDXMLElement(name: "priority", stringValue: "24")
-            presence.addChild(priority)
+            presence?.addChild(priority)
         }
 
         send(presence)
@@ -153,8 +153,8 @@ extension XMPPClientConnection: XMPPStreamDelegate {
      * And subsequent invocations of the completionHandler are ignored.
      **/
     
-    public func xmppStream(_ sender: XMPPStream, didReceiveTrust trust: SecTrustRef, completionHandler:
-        (shouldTrustPeer: Bool?) -> Void) {
+    public func xmppStream(_ sender: XMPPStream, didReceiveTrust trust: SecTrust, completionHandler:
+        @escaping (_ shouldTrustPeer: Bool?) -> Void) {
         let bgQueue = DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default)
         
         bgQueue.async(execute: { () -> Void in
@@ -162,9 +162,9 @@ extension XMPPClientConnection: XMPPStreamDelegate {
             let status = SecTrustEvaluate(trust, &result)
             
             if status == noErr {
-                completionHandler(shouldTrustPeer: true)
+                completionHandler(true)
             } else {
-                completionHandler(shouldTrustPeer: false)
+                completionHandler(false)
             }
         })
     }
@@ -176,7 +176,7 @@ extension XMPPClientConnection: XMPPStreamDelegate {
     public func xmppStreamDidConnect(_ sender: XMPPStream) {
         delegate?.xmppConnectionDidConnect?(sender)
         do {
-            try stream.authenticateWithPassword(password)
+            try stream.authenticate(withPassword: password)
         } catch _ {
             //Handle error
         }
@@ -191,7 +191,7 @@ extension XMPPClientConnection: XMPPStreamDelegate {
         delegate?.xmppConnection?(sender, didNotAuthenticate: error)
     }
     
-    public func xmppStreamDidDisconnect(_ sender: XMPPStream, withError error: NSError) {
+    @nonobjc public func xmppStreamDidDisconnect(_ sender: XMPPStream, withError error: NSError) {
         delegate?.xmppConnectionDidDisconnect?(sender, withError: error)
     }
 }

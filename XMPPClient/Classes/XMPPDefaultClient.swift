@@ -9,7 +9,7 @@
 import Foundation
 import XMPPFramework
 
-public typealias XMPPMessageCompletionHandler = (stream: XMPPStream, message: XMPPMessage) -> Void
+public typealias XMPPMessageCompletionHandler = (_ stream: XMPPStream, _ message: XMPPMessage) -> Void
 
 public protocol XMPPClientDelegate : NSObjectProtocol {
     func xmppClient(_ sender: XMPPStream, didReceiveMessage message: XMPPMessage, from user: XMPPUserCoreDataStorageObject)
@@ -89,43 +89,43 @@ open class XMPPDefaultClient: NSObject {
         }
     }
     
-    open func sendMessage(_ message: String, thread:String, to receiver: String, completionHandler completion:XMPPMessageCompletionHandler) {
-        let body = DDXMLElement.elementWithName("body") as! DDXMLElement
-        let messageID = connection.getStream().generateUUID()
+    open func sendMessage(_ message: String, thread:String, to receiver: String, completionHandler completion:@escaping XMPPMessageCompletionHandler) {
+        let body = DDXMLElement.element(withName: "body") as! DDXMLElement
+        let messageID = connection.getStream().generateUUID()!
         
-        body.setStringValue(message)
+        body.stringValue = message
         
-        let threadElement = DDXMLElement.elementWithName("thread") as! DDXMLElement
-        threadElement.setStringValue(thread)
+        let threadElement = DDXMLElement.element(withName: "thread") as! DDXMLElement
+        threadElement.stringValue = thread
         
-        let completeMessage = DDXMLElement.elementWithName("message") as! DDXMLElement
+        let completeMessage = DDXMLElement.element(withName: "message") as! DDXMLElement
         
-        completeMessage.addAttributeWithName("id", stringValue: messageID)
-        completeMessage.addAttributeWithName("type", stringValue: "chat")
-        completeMessage.addAttributeWithName("to", stringValue: receiver)
+        completeMessage.addAttribute(withName: "id", stringValue: messageID)
+        completeMessage.addAttribute(withName: "type", stringValue: "chat")
+        completeMessage.addAttribute(withName: "to", stringValue: receiver)
         completeMessage.addChild(body)
         completeMessage.addChild(threadElement)
         
         messageCompletionHandler = completion
-        connection.getStream().sendElement(completeMessage)
+        connection.getStream().send(completeMessage)
     }
     
 }
 
 extension XMPPDefaultClient: XMPPStreamDelegate {
     
-    public func xmppStream(_ sender: XMPPStream, didSendMessage message: XMPPMessage) {
+    public func xmppStream(_ sender: XMPPStream, didSend message: XMPPMessage) {
         if let completion = messageCompletionHandler {
-            completion(stream: sender, message: message)
+            completion(sender, message)
         }
     }
     
-    public func xmppStream(_ sender: XMPPStream, didReceiveMessage message: XMPPMessage) {
-        let user = roster.storage.userForJID(message.from(), xmppStream: connection.getStream(), managedObjectContext: roster.storage.mainThreadManagedObjectContext)
+    public func xmppStream(_ sender: XMPPStream, didReceive message: XMPPMessage) {
+        let user = roster.storage.user(for: message.from(), xmppStream: connection.getStream(), managedObjectContext: roster.storage.mainThreadManagedObjectContext)
         if message.isChatMessageWithBody() {
-            delegate?.xmppClient(sender, didReceiveMessage: message, from: user)
-        } else if let _ = message.elementForName("composing") {
-            delegate?.xmppClient(sender, userIsComposing: user)
+            delegate?.xmppClient(sender, didReceiveMessage: message, from: user!)
+        } else if let _ = message.forName("composing") {
+            delegate?.xmppClient(sender, userIsComposing: user!)
         }
     }
 }

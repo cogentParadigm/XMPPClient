@@ -16,7 +16,7 @@ open class XMPPClientRoster: NSObject {
     }()
     
     open lazy var roster: XMPPRoster = {
-        let roster = XMPPRoster(rosterStorage:self.storage)
+        let roster = XMPPRoster(rosterStorage:self.storage)!
         roster.autoFetchRoster = true
         roster.autoAcceptKnownPresenceSubscriptionRequests = true
         roster.autoClearAllUsersAndResources = false
@@ -35,8 +35,8 @@ open class XMPPClientRoster: NSObject {
     }
     
     open func userForJID(_ jid: String) -> XMPPUserCoreDataStorageObject? {
-        let userJID = XMPPJID.jidWithString(jid)
-        if let user = storage.userForJID(userJID, xmppStream: connection.getStream(), managedObjectContext: storage.mainThreadManagedObjectContext) {
+        let userJID = XMPPJID(string:jid)
+        if let user = storage.user(for: userJID, xmppStream: connection.getStream(), managedObjectContext: storage.mainThreadManagedObjectContext) {
             return user
         } else {
             return nil
@@ -44,27 +44,27 @@ open class XMPPClientRoster: NSObject {
     }
     
     open func sendBuddyRequestTo(_ username: String) {
-        let presence: DDXMLElement = DDXMLElement.elementWithName("presence") as! DDXMLElement
-        presence.addAttributeWithName("type", stringValue: "subscribe")
-        presence.addAttributeWithName("to", stringValue: username)
-        presence.addAttributeWithName("from", stringValue: connection.getStream().myJID.bare())
-        connection.getStream().sendElement(presence)
+        let presence: DDXMLElement = DDXMLElement.element(withName: "presence") as! DDXMLElement
+        presence.addAttribute(withName: "type", stringValue: "subscribe")
+        presence.addAttribute(withName: "to", stringValue: username)
+        presence.addAttribute(withName: "from", stringValue: connection.getStream().myJID.bare())
+        connection.getStream().send(presence)
     }
     
     open func acceptBuddyRequestFrom(_ username: String) {
-        let presence: DDXMLElement = DDXMLElement.elementWithName("presence") as! DDXMLElement
-        presence.addAttributeWithName("to", stringValue: username)
-        presence.addAttributeWithName("from", stringValue: connection.getStream().myJID.bare())
-        presence.addAttributeWithName("type", stringValue: "subscribed")
-        connection.getStream().sendElement(presence)
+        let presence: DDXMLElement = DDXMLElement.element(withName: "presence") as! DDXMLElement
+        presence.addAttribute(withName: "to", stringValue: username)
+        presence.addAttribute(withName: "from", stringValue: connection.getStream().myJID.bare())
+        presence.addAttribute(withName: "type", stringValue: "subscribed")
+        connection.getStream().send(presence)
     }
     
     open func declineBuddyRequestFrom(_ username: String) {
-        let presence: DDXMLElement = DDXMLElement.elementWithName("presence") as! DDXMLElement
-        presence.addAttributeWithName("to", stringValue: username)
-        presence.addAttributeWithName("from", stringValue: connection.getStream().myJID.bare())
-        presence.addAttributeWithName("type", stringValue: "unsubscribed")
-        connection.getStream().sendElement(presence)
+        let presence: DDXMLElement = DDXMLElement.element(withName: "presence") as! DDXMLElement
+        presence.addAttribute(withName: "to", stringValue: username)
+        presence.addAttribute(withName: "from", stringValue: connection.getStream().myJID.bare())
+        presence.addAttribute(withName: "type", stringValue: "unsubscribed")
+        connection.getStream().send(presence)
     }
 
 }

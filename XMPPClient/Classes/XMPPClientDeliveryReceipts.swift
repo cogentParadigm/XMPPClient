@@ -11,7 +11,7 @@ import XMPPFramework
 
 open class XMPPClientDeliveryReceipts: NSObject {
     open lazy var receipts: XMPPMessageDeliveryReceipts = {
-        let receipts = XMPPMessageDeliveryReceipts(dispatchQueue: dispatch_get_main_queue())
+        let receipts = XMPPMessageDeliveryReceipts(dispatchQueue: DispatchQueue.main)!
         receipts.autoSendMessageDeliveryReceipts = true
         receipts.autoSendMessageDeliveryRequests = true
         return receipts
