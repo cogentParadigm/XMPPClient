@@ -25,7 +25,7 @@ import XMPPFramework
     @objc optional func xmppConnectionDidConnect(_ sender: XMPPStream)
     @objc optional func xmppConnectionDidAuthenticate(_ sender: XMPPStream)
     @objc optional func xmppConnection(_ sender: XMPPStream, didNotAuthenticate error: DDXMLElement)
-    @objc optional func xmppConnectionDidDisconnect(_ sender: XMPPStream, withError error: NSError)
+    @objc optional func xmppConnectionDidDisconnect(_ sender: XMPPStream, withError error: Error)
 }
 
 open class XMPPClientConnection: NSObject {
@@ -191,7 +191,7 @@ extension XMPPClientConnection: XMPPStreamDelegate {
         delegate?.xmppConnection?(sender, didNotAuthenticate: error)
     }
     
-    @nonobjc public func xmppStreamDidDisconnect(_ sender: XMPPStream, withError error: NSError) {
+    public func xmppStreamDidDisconnect(_ sender: XMPPStream, withError error: Error) {
         delegate?.xmppConnectionDidDisconnect?(sender, withError: error)
     }
 }

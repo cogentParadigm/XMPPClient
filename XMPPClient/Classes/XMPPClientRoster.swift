@@ -20,6 +20,7 @@ open class XMPPClientRoster: NSObject {
         roster.autoFetchRoster = true
         roster.autoAcceptKnownPresenceSubscriptionRequests = true
         roster.autoClearAllUsersAndResources = false
+        roster.addDelegate(self, delegateQueue:DispatchQueue.main)
         return roster
     }()
     
@@ -67,4 +68,13 @@ open class XMPPClientRoster: NSObject {
         connection.getStream().send(presence)
     }
 
+}
+
+extension XMPPClientRoster: XMPPRosterDelegate {
+    public func xmppRosterDidEndPopulating(sender: XMPPRoster?) {
+        //let jidList = storage.jidsForXMPPStream(connection.connection.getStream())
+        //print("List=\(jidList)")
+        print("ROSTER POPULATED")
+        
+    }
 }
